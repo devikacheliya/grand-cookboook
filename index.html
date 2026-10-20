@@ -1,0 +1,340 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta name="theme-color" content="#ffd9e9" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ctext y='24' font-size='24'%3E%F0%9F%A5%9E%3C/text%3E%3C/svg%3E" />
+    <meta
+      name="description"
+      content="The Grand Cookbook of Dreams: a whimsical 3D browser platformer across four sweet realms — Breakfast Uplands, Confectionery Coast, Midnight Patisserie and Cloud-Nine Confection."
+    />
+    <title>The Grand Cookbook of Dreams — Four Sweet Realms</title>
+  </head>
+  <body>
+    <div id="app">
+      <div id="canvas-host" aria-label="The Grand Cookbook of Dreams 3D game world"></div>
+
+      <div id="rain-sheen" aria-hidden="true"></div>
+      <div id="sun-glow" aria-hidden="true"></div>
+      <div id="damage-vignette" aria-hidden="true"></div>
+
+      <div id="hud" class="is-hidden" aria-live="off">
+        <section class="hud-book glass-card" aria-label="Cookbook progress">
+          <div class="book-art" aria-hidden="true">
+            <svg viewBox="0 0 64 56" role="presentation">
+              <defs>
+                <linearGradient id="bookCover" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0" stop-color="#b9626c" />
+                  <stop offset="0.55" stop-color="#8c4058" />
+                  <stop offset="1" stop-color="#613044" />
+                </linearGradient>
+                <linearGradient id="bookPage" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0" stop-color="#fffdf3" />
+                  <stop offset="1" stop-color="#ffe7b3" />
+                </linearGradient>
+              </defs>
+              <path d="M8 7c8-2 16-1 24 4v38c-8-5-16-6-24-4V7Z" fill="url(#bookPage)" stroke="#e4b76b" stroke-width="1.5" />
+              <path d="M56 7c-8-2-16-1-24 4v38c8-5 16-6 24-4V7Z" fill="url(#bookPage)" stroke="#e4b76b" stroke-width="1.5" />
+              <path d="M5 4c9-2 19 0 27 6v40C23 44 13 42 5 44V4Z" fill="url(#bookCover)" stroke="#f7cf8a" stroke-width="1.6" />
+              <path d="M59 4c-9-2-19 0-27 6v40c9-6 19-8 27-6V4Z" fill="#a54f64" stroke="#f7cf8a" stroke-width="1.6" />
+              <path d="M32 10v40" stroke="#f7cf8a" stroke-width="2" stroke-linecap="round" />
+              <path d="M14 16c4-1 7 0 10 2M14 23c4-1 7 0 10 2" stroke="#f9dba6" stroke-width="1.5" stroke-linecap="round" opacity=".9" />
+              <path d="m47 17 1.8 3.7 4.1.6-3 2.9.7 4.1-3.7-1.9-3.7 1.9.7-4.1-3-2.9 4.1-.6L47 17Z" fill="#ffd96f" />
+              <path d="M23 48c3 3 6 4 9 4s6-1 9-4" fill="none" stroke="#f7cf8a" stroke-width="1.5" stroke-linecap="round" opacity=".65" />
+            </svg>
+          </div>
+          <div class="book-copy">
+            <span class="eyebrow">The Grand Cookbook</span>
+            <div class="book-count"><span>Pages Collected</span><strong><span id="page-count">0</span><em>/ 4</em></strong></div>
+            <div id="book-pips" class="book-pips" aria-hidden="true"></div>
+          </div>
+        </section>
+
+        <section id="objective-card" class="objective-card glass-card" aria-label="Current objective">
+          <span class="objective-spark" aria-hidden="true">✦</span>
+          <div>
+            <span id="objective-eyebrow" class="eyebrow">A page is waiting</span>
+            <p id="objective-text">Recover the Sunbeam Syrup page</p>
+            <span id="objective-progress" class="objective-progress is-hidden">0 / 3</span>
+          </div>
+        </section>
+
+        <div id="radar" class="radar is-hidden" aria-label="Pip's cinnamon radar">
+          <div class="radar-ring">
+            <div id="radar-arrow" class="radar-arrow" aria-hidden="true">
+              <svg viewBox="0 0 40 40"><path d="M20 3 27 24 20 20 13 24 20 3Z" fill="currentColor" /></svg>
+            </div>
+            <span class="radar-dot"></span>
+          </div>
+          <div class="radar-copy">
+            <strong>Pip's cinnamon sense</strong>
+            <span id="radar-label">a page is nearby</span>
+          </div>
+        </div>
+
+        <div class="hud-top-right">
+          <section class="location-card">
+            <span class="eyebrow">Now wandering</span>
+            <h2 id="location-name">Breakfast Uplands</h2>
+            <span class="location-rule" aria-hidden="true"></span>
+            <p id="location-chapter">Dreamtopia · Chapter One</p>
+          </section>
+          <div class="hud-actions">
+            <button id="btn-hint" class="round-btn" type="button" aria-label="Ask Pip for a hint (H)" title="Ask Pip for a hint (H)">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3c4.2 0 7 2.7 7 6.4 0 2.4-1.1 4.1-3 5.3-1.1.7-1.5 1.3-1.5 2.4v.4h-5v-.5c0-1.6-.6-2.4-1.8-3.2-1.7-1.1-2.7-2.8-2.7-4.8C5 5.6 7.8 3 12 3Z" fill="currentColor" opacity=".9"/><circle cx="12" cy="20.5" r="1.7" fill="currentColor"/><path d="M9.5 9.2c.5-1.2 1.4-1.8 2.7-1.8 1.7 0 2.8 1 2.8 2.5 0 1.1-.6 1.8-1.7 2.4-.5.3-.8.6-.8 1.1" fill="none" stroke="#854d58" stroke-width="1.4" stroke-linecap="round"/></svg>
+              <span class="round-btn-label">Hint</span>
+            </button>
+            <button id="btn-sound" class="round-btn" type="button" aria-label="Toggle sound" title="Toggle sound">
+              <svg class="icon-sound-on" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.2L12 5.8v12.4L7.2 14.5H4v-5Z" fill="currentColor"/><path d="M15 9c1.2.8 2 2.1 2 3.5S16.2 15.2 15 16M17.5 6.5c2 1.5 3.2 3.6 3.2 6s-1.2 4.5-3.2 6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+              <svg class="icon-sound-off" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.2L12 5.8v12.4L7.2 14.5H4v-5Z" fill="currentColor"/><path d="m16 9 5 5m0-5-5 5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+            </button>
+            <button id="btn-pause" class="round-btn" type="button" aria-label="Pause game" title="Pause (Esc)">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="4" width="4" height="16" rx="1.4" fill="currentColor"/><rect x="14" y="4" width="4" height="16" rx="1.4" fill="currentColor"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <section class="health-card glass-card" aria-label="Gingerbread health">
+          <div id="health-cookie" class="health-cookie" data-mood="bright" aria-hidden="true">
+            <svg viewBox="0 0 86 92" role="presentation">
+              <defs>
+                <linearGradient id="ginger" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0" stop-color="#de8f54" />
+                  <stop offset="1" stop-color="#b66135" />
+                </linearGradient>
+                <linearGradient id="icing" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0" stop-color="#fff8ed" />
+                  <stop offset="1" stop-color="#ffdcec" />
+                </linearGradient>
+              </defs>
+              <path d="M34 26c-4-9 1-18 10-18s14 9 10 18c9-1 16 6 15 15-1 8-7 12-15 12 2 9-3 18-12 18S25 62 27 53c-8 1-14-4-14-12 0-9 7-16 15-15" fill="url(#ginger)" stroke="#8e4a2a" stroke-width="2" />
+              <path d="M24 8c8-1 14 3 15 10M60 8c-7-1-12 3-14 9" fill="none" stroke="#f7c59f" stroke-width="2" stroke-linecap="round" opacity=".55" />
+              <path d="M30 64c0 5 4 8 9 8s9-3 9-8" fill="none" stroke="#f0a76a" stroke-width="2" stroke-linecap="round" opacity=".55" />
+              <ellipse cx="34" cy="43" rx="2.3" ry="3" fill="#613326" />
+              <ellipse cx="52" cy="43" rx="2.3" ry="3" fill="#613326" />
+              <circle cx="29" cy="51" r="3.2" fill="#ff8cad" opacity=".45" />
+              <circle cx="57" cy="51" r="3.2" fill="#ff8cad" opacity=".45" />
+              <path id="cookie-mouth" d="M36 52c3 4 11 4 14 0" fill="none" stroke="#613326" stroke-width="2.2" stroke-linecap="round" />
+              <path d="M30 30c4-4 9-5 13-5 5 0 10 1 14 5-2 5-7 8-14 8s-11-3-13-8Z" fill="url(#icing)" opacity=".95" />
+              <circle cx="37" cy="29" r="1.8" fill="#ffca57" />
+              <circle cx="46" cy="27" r="1.4" fill="#8ee8c0" />
+              <circle cx="53" cy="31" r="1.7" fill="#ff7fae" />
+            </svg>
+            <span class="cookie-bite bite-one"></span>
+            <span class="cookie-bite bite-two"></span>
+          </div>
+          <div class="health-copy">
+            <span class="eyebrow">Gingerbread grit</span>
+            <div id="health-pips" class="health-pips" aria-label="3 of 3 health">
+              <span class="health-pip is-filled" aria-hidden="true"></span>
+              <span class="health-pip is-filled" aria-hidden="true"></span>
+              <span class="health-pip is-filled" aria-hidden="true"></span>
+            </div>
+            <p id="health-label">Sprinkled &amp; sweet</p>
+          </div>
+        </section>
+
+        <div class="control-ribbon">
+          <span><kbd>WASD</kbd> move</span>
+          <i></i>
+          <span><kbd>Space</kbd> jump ×2</span>
+          <i></i>
+          <span><kbd>Drag</kbd> look</span>
+          <i></i>
+          <span><kbd>Q</kbd> dash</span>
+          <i></i>
+          <span><kbd>E</kbd> shadow-step</span>
+          <i></i>
+          <span><kbd>H</kbd> hint</span>
+          <i></i>
+          <span><kbd>Esc</kbd> pause</span>
+        </div>
+
+        <section id="pip-dialogue" class="pip-dialogue is-hidden" aria-live="polite">
+          <div class="pip-portrait" aria-hidden="true">
+            <svg viewBox="0 0 80 80">
+              <defs>
+                <linearGradient id="pipHair" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffd1e7"/><stop offset="1" stop-color="#ff7fbd"/></linearGradient>
+                <linearGradient id="pipDress" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff9dc8"/><stop offset="1" stop-color="#e9559e"/></linearGradient>
+                <linearGradient id="pipWing" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff8ce" stop-opacity=".9"/><stop offset="1" stop-color="#9fffe7" stop-opacity=".3"/></linearGradient>
+              </defs>
+              <path d="M24 40C8 22 6 49 17 55c-7 12 12 16 19 8" fill="url(#pipWing)" stroke="#fff2c9" stroke-width="1.3" />
+              <path d="M56 40c16-18 18 9 7 15 7 12-12 16-19 8" fill="url(#pipWing)" stroke="#fff2c9" stroke-width="1.3" />
+              <path d="M31 50c0-8 4-13 9-13s10 5 10 13l5 19H26l5-19Z" fill="url(#pipDress)" />
+              <circle cx="40" cy="36" r="15" fill="#ffd8be" />
+              <path d="M25 34c-1-13 9-19 18-18 10 1 15 9 12 20-5-3-8-8-9-12-4 6-11 10-21 10Z" fill="url(#pipHair)" />
+              <path d="M28 28c-6 2-9 8-8 14 4 3 8 0 10-4" fill="url(#pipHair)" />
+              <ellipse cx="35" cy="37" rx="1.7" ry="2.4" fill="#633b49" />
+              <ellipse cx="46" cy="37" rx="1.7" ry="2.4" fill="#633b49" />
+              <path d="M37 43c2 1.7 4 1.7 6 0" fill="none" stroke="#b95770" stroke-width="1.4" stroke-linecap="round" />
+              <circle cx="30" cy="42" r="2.5" fill="#ff9db7" opacity=".7" />
+              <circle cx="51" cy="42" r="2.5" fill="#ff9db7" opacity=".7" />
+              <path d="M63 54c4 1 7 3 8 7-3 2-7 1-10-1" fill="#ffe27b" stroke="#c99127" stroke-width="1" />
+              <path d="M68 61v10m-3-7 3-3 3 3" fill="none" stroke="#d59c2d" stroke-width="1.6" stroke-linecap="round" />
+            </svg>
+          </div>
+          <div class="pip-bubble">
+            <span class="pip-name">Pip <em>· sugar-fairy guide</em></span>
+            <p id="pip-line">Follow the waffle trail!</p>
+          </div>
+        </section>
+
+        <div id="toast" class="toast is-hidden" role="status"></div>
+      </div>
+
+      <div id="touch-controls" class="touch-controls is-hidden" aria-hidden="true">
+        <div id="joystick-zone" class="joystick-zone">
+          <div class="joystick-ring"></div>
+          <div id="joystick-knob" class="joystick-knob"></div>
+        </div>
+        <div class="touch-abilities">
+          <button id="touch-phase" class="touch-ability touch-ability-phase" type="button" aria-label="Shadow-step">
+            <span>Phase</span>
+            <small>E</small>
+          </button>
+          <button id="touch-dash" class="touch-ability touch-ability-dash" type="button" aria-label="Ice-skate dash">
+            <span>Dash</span>
+            <small>Q</small>
+          </button>
+        </div>
+        <button id="touch-jump" class="touch-jump" type="button" aria-label="Jump">
+          <span>Jump</span>
+          <small>double tap</small>
+        </button>
+        <button id="touch-look" class="touch-look" type="button" aria-label="Drag the right side of the screen to look around">
+          <span>Drag to look</span>
+        </button>
+      </div>
+
+      <div id="fade-layer" class="fade-layer" aria-hidden="true"></div>
+
+      <div id="chapter-intro" class="chapter-intro is-hidden" aria-hidden="true">
+        <span class="chapter-kicker">The Grand Cookbook of Dreams</span>
+        <h2 id="chapter-intro-title">Chapter One</h2>
+        <p id="chapter-intro-sub">The Breakfast Uplands</p>
+      </div>
+
+      <section id="loading-screen" class="screen loading-screen">
+        <div class="loading-lockup">
+          <div class="loading-star" aria-hidden="true">
+            <span></span><span></span><span></span><span></span>
+          </div>
+          <p class="eyebrow">The Grand Cookbook of Dreams</p>
+          <h1>Whipping up the clouds…</h1>
+          <p id="loading-copy">Warming the syrup and waking the lollipops.</p>
+        </div>
+      </section>
+
+      <section id="title-screen" class="screen title-screen">
+        <div class="title-sugar" aria-hidden="true">
+          <span class="sugar-dot dot-1"></span>
+          <span class="sugar-dot dot-2"></span>
+          <span class="sugar-dot dot-3"></span>
+          <span class="sugar-dot dot-4"></span>
+          <span class="sugar-dot dot-5"></span>
+          <span class="sugar-star star-1">✦</span>
+          <span class="sugar-star star-2">✧</span>
+        </div>
+        <div class="title-card">
+          <div class="chapter-ribbon"><span id="title-chapter">Chapter One</span><i>✦</i><span id="title-realm">Breakfast Uplands</span></div>
+          <p class="title-kicker">A Grand Cookbook of Dreams adventure</p>
+          <h1>The Grand<br /><span>Cookbook of Dreams</span></h1>
+          <p class="title-subtitle">Four realms · one hungry wind</p>
+          <div class="title-divider" aria-hidden="true"><span></span><i>❖</i><span></span></div>
+          <p class="title-story">
+            A mischievous gust has torn four pages from the Grand Cookbook of Dreams, and every sweet realm has gone
+            delightfully haywire. With Pip, your spun-sugar fairy guide, travel from the Breakfast Uplands to the
+            Cloud-Nine Confection and bring every recipe home.
+          </p>
+          <div id="level-select" class="level-select" aria-label="Choose a realm"></div>
+          <div class="title-actions">
+            <button id="btn-start" class="btn btn-primary" type="button">
+              <span id="btn-start-label">Begin the adventure</span>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+            </button>
+            <span class="sound-note"><span class="sound-note-dot"></span> Gentle sound &amp; music</span>
+          </div>
+          <div class="title-controls">
+            <div><span class="keys"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd></span><small>Wander</small></div>
+            <div><span class="keys"><kbd>Space</kbd></span><small>Jump / double jump</small></div>
+            <div><span class="keys"><kbd>Q</kbd><kbd>E</kbd></span><small>Dash / shadow-step</small></div>
+            <div><span class="keys"><kbd>H</kbd></span><small>Ask Pip</small></div>
+          </div>
+          <div class="title-footer">
+            <span>Touch controls on little screens</span>
+            <span id="best-time-row" class="best-time is-hidden">Best journey <strong id="best-time">—</strong></span>
+          </div>
+        </div>
+        <p class="title-credit">An original fairy-tale confection · built for the browser</p>
+      </section>
+
+      <section id="pause-screen" class="screen modal-screen is-hidden">
+        <div class="modal-card pause-card">
+          <div class="modal-sprinkles" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+          <p class="eyebrow">The world can wait</p>
+          <h2>A sugary pause</h2>
+          <p class="modal-copy">Pip is keeping the syrup warm. Ready when you are.</p>
+          <div class="modal-actions">
+            <button id="btn-resume" class="btn btn-primary" type="button">Back to the adventure</button>
+            <button id="btn-restart-checkpoint" class="btn btn-secondary" type="button">Return to checkpoint</button>
+          </div>
+          <div class="pause-options">
+            <button id="btn-pause-sound" class="text-btn" type="button">Sound: on</button>
+            <span>·</span>
+            <button id="btn-quit" class="text-btn" type="button">Return to title</button>
+          </div>
+        </div>
+      </section>
+
+      <section id="complete-screen" class="screen modal-screen is-hidden">
+        <div class="complete-shell">
+          <div class="complete-page" aria-hidden="true">
+            <span class="page-gem">✦</span>
+            <span class="page-flourish">❦</span>
+            <p id="recipe-index" class="recipe-index">Recipe the First</p>
+            <h2 id="recipe-title">The Fluffy Pancake Recipe</h2>
+            <div class="page-divider"></div>
+            <div id="recipe-lines" class="recipe-lines"></div>
+            <p id="recipe-poem" class="recipe-copy"></p>
+            <div class="page-scribble"></div>
+            <span id="recipe-seal" class="page-seal">1 / 4</span>
+          </div>
+          <div class="complete-copy">
+            <p id="complete-kicker" class="eyebrow">The first page is home</p>
+            <h2 id="complete-title">The syrup sings again.</h2>
+            <p id="complete-copy">
+              The Breakfast Uplands are sparkling, Pip is doing loop-the-loops, and one very important page has found
+              its way back into the Grand Cookbook of Dreams.
+            </p>
+            <div class="complete-stats">
+              <div><span>Journey time</span><strong id="stat-time">—</strong></div>
+              <div><span>Tumbles</span><strong id="stat-falls">—</strong></div>
+              <div><span>Sugar hearts</span><strong id="stat-hearts">—</strong></div>
+            </div>
+            <div id="ability-card" class="ability-card is-hidden">
+              <span class="ability-star" aria-hidden="true">✦</span>
+              <div>
+                <span class="eyebrow">New ability unlocked</span>
+                <strong id="ability-name">Bounce-Jump</strong>
+                <p id="ability-copy"></p>
+              </div>
+            </div>
+            <div class="modal-actions">
+              <button id="btn-next-level" class="btn btn-primary" type="button">Onward</button>
+              <button id="btn-play-again" class="btn btn-secondary" type="button">Adventure again</button>
+            </div>
+            <p class="complete-note"><span id="complete-note"></span> <button id="btn-title" class="text-btn" type="button">Return to title</button></p>
+          </div>
+        </div>
+      </section>
+
+      <div id="fatal-error" class="fatal-error is-hidden" role="alert">
+        <h1>A little magic went missing.</h1>
+        <p id="fatal-error-copy">This browser could not start the 3D adventure.</p>
+      </div>
+    </div>
+    <noscript>This fairy tale needs JavaScript enabled to sprinkle its magic.</noscript>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
